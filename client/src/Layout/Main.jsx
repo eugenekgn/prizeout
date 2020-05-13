@@ -35,7 +35,8 @@ class Main extends React.Component {
         openLogIn: true,
         brands: [],
         inputValue: 0,
-        isLoading: false
+        isLoading: false,
+        brandsSelected: []
     }
 
     onFinishFailed = errorInfo => {
@@ -68,11 +69,17 @@ class Main extends React.Component {
         })
     }
 
-
+    onSelectBrand = (brandItem) => {
+        console.log(brandItem)
+        this.setState({
+            brandsSelected: [...this.state.brandsSelected, brandItem]
+        })
+    }
     render() {
 
-        const { openLogIn, balanceInCents, currencyCode, email, brands, isLoading } = this.state
+        const { openLogIn, balanceInCents, currencyCode, email, brands, isLoading, brandsSelected } = this.state
         const hasBrands = brands.length > 0
+        const canSelectMore = brandsSelected.length === 5
 
         return (
             <Layout className="layout" style={{ height: '100%' }}>
@@ -84,7 +91,7 @@ class Main extends React.Component {
 
                 <Content style={css.content}>
 
-                    {!openLogIn && <Text type="secondary">Email {email} | Currency: {currencyCode} | Available Balance: ${balanceInCents / 100}.00 </Text>}
+                    {!openLogIn && <Text type="secondary">Email {email} | Currency: {currencyCode} | Available Balance: ${balanceInCents / 100}.00 | Items In Cart {brandsSelected.length} </Text>}
                     <LogIn visible={openLogIn} onLogIn={this.onLogIn} />
                     {isLoading &&
                         <div className="spinWrapper">
@@ -95,6 +102,8 @@ class Main extends React.Component {
                         data={brands}
                         balanceInCents={balanceInCents}
                         currencyCode={currencyCode}
+                        onSelectBrand={this.onSelectBrand}
+                        disableAdding={canSelectMore}
                     />}
 
 

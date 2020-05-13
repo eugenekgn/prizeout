@@ -43,7 +43,7 @@ class BrandsGrid extends React.Component {
 
     render() {
 
-        const { balanceInCents, currencyCode, data, inputValue } = this.props
+        const { balanceInCents, currencyCode, data, onSelectBrand, disableAdding } = this.props
 
         return (
             <List
@@ -81,7 +81,7 @@ class BrandsGrid extends React.Component {
                                             onChange={this.onChange}
                                         />
 
-                                        <Button size="small">Buy</Button>
+                                        <Button size="small" disabled={disableAdding} onClick={() => onSelectBrand(brand)}>Add</Button>
                                         <Button size="small" onClick={() => this.showMore(brand)}>More</Button>
                                     </Col>
                                 </Row>
@@ -94,7 +94,7 @@ class BrandsGrid extends React.Component {
                                                 brand.allowed_prices_in_cents.map(m => <Option value={m}>{currencyCode} {m}</Option>)
                                             }
                                         </Select>
-                                        <Button size="small">Add</Button>
+                                        <Button size="small" disabled={disableAdding} onClick={() => onSelectBrand(brand)} >Add</Button>
                                         <Button size="small" onClick={() => this.showMore(brand)}>More</Button>
                                     </Col>
                                 </Row>

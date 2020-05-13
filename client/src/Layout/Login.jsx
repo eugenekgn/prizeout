@@ -36,8 +36,8 @@ const LogIn = ({ visible, onLogIn, onCancel }) => {
                 layout="vertical"
                 name="form_in_modal"
                 initialValues={{
-                    email: '',
-                    currencyCode: ''
+                    email: 'eugenekgn@gmail.com',
+                    currencyCode: 'USD'
                 }}
             >
 
