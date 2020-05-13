@@ -1,0 +1,19 @@
+<div>
+	<div style="padding:15px;text-align:center;font-size:16px;font-weight:700;background-color:#1976D2;color:#ffffff;">
+		Prizeout
+	</div>
+	<!-- The user's balance if any -->
+	<div style="padding:15px;text-align:right;font-size:12px;font-weight:400;background-color:#78909C;color:#ffffff;"
+		ng-if="core.user_balance">
+		Balance: {{core.currency_code}} {{core.user_balance/100|number:2}}
+	</div>
+	<!-- Loads the right directive based on the page to display -->
+
+	<!-- Index page, the default, asking the user to select the currency to use -->
+	<div app-index ng-if="core.page=='index'">
+
+	</div>
+
+	<!-- The giftcard page, listing the available giftcards -->
+	<div app-giftcards ng-if="core.page=='giftcards'"></div>
+</div>

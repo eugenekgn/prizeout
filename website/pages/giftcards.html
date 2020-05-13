@@ -1,0 +1,36 @@
+<div>
+	<div ng-if="main.loading" style="text-align:center;padding:50px 20px;">
+		Loading... Please wait...
+	</div>
+	<div ng-if="!main.loading" style="text-align:center;padding:20px;">
+		Load & display the giftcards here. Implement the booking process.
+		<table class="index-form">
+			<tbody>
+				<tr>
+					<td>
+						Email:
+					</td>
+					<td>
+						{{core.user_email}}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Currency:
+					</td>
+					<td>
+						{{core.currency_code}}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Available Balance:
+					</td>
+					<td>
+						{{core.currency_code}}{{core.user_balance/100|number:2}}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
