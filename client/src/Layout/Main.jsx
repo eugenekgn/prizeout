@@ -7,7 +7,7 @@ import '../styles/css.css';
 import {
     Layout,
     Typography,
-    Select
+    Spin
 } from 'antd'
 import LogIn from './Login';
 
@@ -34,7 +34,8 @@ class Main extends React.Component {
         email: null,
         openLogIn: true,
         brands: [],
-        inputValue: 0
+        inputValue: 0,
+        isLoading: false
     }
 
     onFinishFailed = errorInfo => {
@@ -53,18 +54,24 @@ class Main extends React.Component {
             ...userBalance
         })
 
+        this.setState({
+            isLoading: true
+        })
         //rename to selected currencyCode to avoid ambiguity
         const brands = await api.getGiftcardBrands(currencyCode)
 
         this.setState({
             brands
         })
+        this.setState({
+            isLoading: false
+        })
     }
 
 
     render() {
 
-        const { openLogIn, balanceInCents, currencyCode, email, brands } = this.state
+        const { openLogIn, balanceInCents, currencyCode, email, brands, isLoading } = this.state
         const hasBrands = brands.length > 0
 
         return (
@@ -76,8 +83,14 @@ class Main extends React.Component {
                 </Header>
 
                 <Content style={css.content}>
+
                     {!openLogIn && <Text type="secondary">Email {email} | Currency: {currencyCode} | Available Balance: ${balanceInCents / 100}.00 </Text>}
                     <LogIn visible={openLogIn} onLogIn={this.onLogIn} />
+                    {isLoading &&
+                        <div className="spinWrapper">
+                            <Spin size="large" />
+                        </div>
+                    }
                     {hasBrands && <BrandGrid
                         data={brands}
                         balanceInCents={balanceInCents}

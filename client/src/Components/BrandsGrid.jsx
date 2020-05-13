@@ -94,7 +94,7 @@ class BrandsGrid extends React.Component {
                                                 brand.allowed_prices_in_cents.map(m => <Option value={m}>{currencyCode} {m}</Option>)
                                             }
                                         </Select>
-                                        <Button size="small">Buy</Button>
+                                        <Button size="small">Add</Button>
                                         <Button size="small" onClick={() => this.showMore(brand)}>More</Button>
                                     </Col>
                                 </Row>
