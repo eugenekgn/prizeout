@@ -30,7 +30,7 @@ const css = {
     inputNumber: { margin: '0 2px' }
 }
 
-class BrandsGrid extends React.Component {
+class BrandsGrid extends React.PureComponent {
 
     state = {
         inputValue: 0
@@ -41,13 +41,17 @@ class BrandsGrid extends React.Component {
         alert(JSON.stringify(brand, null, 2))
     }
 
+    onChange = (index, newValue) => {
+
+        this.props.changeValueOfBrand(index, newValue)
+    }
+
     render() {
 
-        const { balanceInCents, currencyCode, data, onSelectBrand, disableAdding } = this.props
-
+        const { currencyCode, brands, onSelectBrand, disableAdding } = this.props
         return (
             <List
-
+                style={{ marginTop: 32 }}
                 grid={gridOptions}
                 pagination={{
                     onChange: page => {
@@ -55,8 +59,8 @@ class BrandsGrid extends React.Component {
                     },
                     pageSize: 50,
                 }}
-                dataSource={data}
-                renderItem={brand => (
+                dataSource={brands}
+                renderItem={(brand, index) => (
 
                     <List.Item>
                         <Card title={brand.name} bordered={true} style={css.card}
@@ -76,9 +80,9 @@ class BrandsGrid extends React.Component {
                                             min={brand.min_price_in_cents}
                                             max={brand.max_price_in_cents}
                                             style={css.inputNumber}
-                                            value={brand.min_price_in_cents}
+                                            value={brand.currentValue}
                                             precision={2}
-                                            onChange={this.onChange}
+                                            onChange={(value) => this.onChange(index, value)} //bit of a hack
                                         />
 
                                         <Button size="small" disabled={disableAdding} onClick={() => onSelectBrand(brand)}>Add</Button>
@@ -89,7 +93,7 @@ class BrandsGrid extends React.Component {
                             {brand.allowed_prices_in_cents &&
                                 <Row>
                                     <Col>
-                                        <Select defaultValue={brand.allowed_prices_in_cents[0]} size={'small'}>
+                                        <Select defaultValue={brand.currentValue} size={'small'}>
                                             {brand.allowed_prices_in_cents &&
                                                 brand.allowed_prices_in_cents.map(m => <Option value={m}>{currencyCode} {m}</Option>)
                                             }

@@ -1,13 +1,14 @@
 import React from 'react';
 import * as api from '../api'
 import BrandGrid from '../Components/BrandsGrid'
-
+import { InfoCircleOutlined } from '@ant-design/icons'
 import 'antd/dist/antd.css';
 import '../styles/css.css';
 import {
     Layout,
     Typography,
-    Spin
+    Spin,
+    Tooltip
 } from 'antd'
 import LogIn from './Login';
 
@@ -58,8 +59,17 @@ class Main extends React.Component {
         this.setState({
             isLoading: true
         })
+
         //rename to selected currencyCode to avoid ambiguity
-        const brands = await api.getGiftcardBrands(currencyCode)
+        let brands = await api.getGiftcardBrands(currencyCode)
+
+        brands = brands.map(brand => {
+            return {
+                ...brand,
+                currentValue: brand.min_price_in_cents || brand.allowed_prices_in_cents[0]
+            }
+
+        })
 
         this.setState({
             brands
@@ -75,6 +85,36 @@ class Main extends React.Component {
             brandsSelected: [...this.state.brandsSelected, brandItem]
         })
     }
+
+    changeValueOfBrand = (index, newValue) => {
+
+        const { brands } = this.state
+        const updatedBrand = Object.assign({}, brands[index], { currentValue: newValue });
+
+        this.setState({
+            brands: [
+                ...brands.slice(0, index),
+                updatedBrand,
+                ...brands.slice(index + 1)
+            ]
+        });
+
+        console.log(this.state)
+    }
+
+    getHeaderInfo = () => {
+
+        const { openLogIn, balanceInCents, currencyCode, email, brands, isLoading, brandsSelected } = this.state
+
+        const tooltipText = brandsSelected.map(brand => `${brand.name} ${brand.currentValue}`).join(' | ') || "Nothing Selected!"
+
+        const tooltipInfo = <Tooltip placement="bottom" title={tooltipText} arrowPointAtCenter>
+            <InfoCircleOutlined />
+        </Tooltip>
+
+        return (<><b>Email:</b> {email} | <b>Currency:</b> {currencyCode} | <b>Available Balance:</b> ${ balanceInCents / 100} .00 | <b>  Items In Cart {tooltipInfo} : </b> {brandsSelected.length} </>)
+    }
+
     render() {
 
         const { openLogIn, balanceInCents, currencyCode, email, brands, isLoading, brandsSelected } = this.state
@@ -91,7 +131,8 @@ class Main extends React.Component {
 
                 <Content style={css.content}>
 
-                    {!openLogIn && <Text type="secondary">Email {email} | Currency: {currencyCode} | Available Balance: ${balanceInCents / 100}.00 | Items In Cart {brandsSelected.length} </Text>}
+                    {!openLogIn &&
+                        <Text type="secondary"> {this.getHeaderInfo()} </Text>}
                     <LogIn visible={openLogIn} onLogIn={this.onLogIn} />
                     {isLoading &&
                         <div className="spinWrapper">
@@ -99,11 +140,12 @@ class Main extends React.Component {
                         </div>
                     }
                     {hasBrands && <BrandGrid
-                        data={brands}
+                        brands={brands}
                         balanceInCents={balanceInCents}
                         currencyCode={currencyCode}
                         onSelectBrand={this.onSelectBrand}
                         disableAdding={canSelectMore}
+                        changeValueOfBrand={this.changeValueOfBrand}
                     />}
 
 

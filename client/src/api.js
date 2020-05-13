@@ -41,5 +41,5 @@ export const getGiftcardBrands = async (currencyCode) => {
 
     const giftCardsData = Object.values(JSON.parse(respose.data))
 
-    return giftCardsData
+    return giftCardsData || []
 }
