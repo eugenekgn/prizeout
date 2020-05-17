@@ -16,12 +16,13 @@
         "request": "latest",
         "sha1": "^1.1.1",
         "underscore": "latest",
+        "uuid": "^8.0.0",
         "validator": "^13.0.0"
     },
     "devDependencies": {
         "nodemon": "^2.0.4"
     },
     "scripts": {
-        "start": "nodemon ./index"
+        "start": "nodemon run-local.js"
     }
 }

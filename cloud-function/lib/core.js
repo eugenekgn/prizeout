@@ -53,7 +53,7 @@ var core = function (params, req, res, handler) {
 	// Add logic here
 	lib.giftcards = require('./giftcards')(lib, params, req, res);
 	lib.users = require('./users')(lib, params, req, res);
-
+	lib.inventory = require('./inventory')(lib, params, req, res);
 	return lib;
 }
 

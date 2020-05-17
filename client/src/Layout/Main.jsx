@@ -4,11 +4,14 @@ import BrandGrid from '../Components/BrandsGrid'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import 'antd/dist/antd.css';
 import '../styles/css.css';
+import { ShoppingCartOutlined } from '@ant-design/icons'
 import {
     Layout,
     Typography,
     Spin,
-    Tooltip
+    Tooltip,
+    notification,
+    Button
 } from 'antd'
 import LogIn from './Login';
 
@@ -30,27 +33,21 @@ const css = {
 class Main extends React.Component {
 
     state = {
-        balanceInCents: null,
+        balance_in_cents: null,
         currencyCode: null,
-        email: null,
+        user: null,
         openLogIn: true,
         brands: [],
         inputValue: 0,
         isLoading: false,
-        brandsSelected: []
+        brandsSelected: [],
+
     }
-
-    onFinishFailed = errorInfo => {
-        console.log('Failed:', errorInfo);
-    };
-
-    onFinish = values => {
-        console.log('Success:', values);
-    };
 
     onLogIn = async ({ email, currencyCode }) => {
 
         const userBalance = await api.getUserBalance(email, currencyCode)
+        console.log(userBalance)
         this.setState({
             openLogIn: !this.state.openLogIn,
             ...userBalance
@@ -64,11 +61,16 @@ class Main extends React.Component {
         let brands = await api.getGiftcardBrands(currencyCode)
 
         brands = brands.map(brand => {
-            return {
+            const modBrand = {
                 ...brand,
-                currentValue: brand.min_price_in_cents || brand.allowed_prices_in_cents[0]
+                currentValue: brand.min_price_in_cents / 100 || brand.allowed_prices_in_cents[0] / 100 //hack
             }
 
+            if (modBrand.allowed_prices_in_cents) {
+                modBrand.allowed_prices_in_cents = modBrand.allowed_prices_in_cents.map(val => val / 100)
+            }
+
+            return modBrand
         })
 
         this.setState({
@@ -80,7 +82,15 @@ class Main extends React.Component {
     }
 
     onSelectBrand = (brandItem) => {
-        console.log(brandItem)
+        const { balance_in_cents, currencyCode } = this.state
+        const currentBlanceInDollars = balance_in_cents / 100
+        if (brandItem.currentValue > currentBlanceInDollars) {
+            notification['error']({
+                message: 'Lack of funds!',
+                description: `You're ${currencyCode} ${Math.abs(currentBlanceInDollars - brandItem.currentValue)}.00 short`
+            });
+            return;
+        }
         this.setState({
             brandsSelected: [...this.state.brandsSelected, brandItem]
         })
@@ -98,26 +108,54 @@ class Main extends React.Component {
                 ...brands.slice(index + 1)
             ]
         });
+    }
 
-        console.log(this.state)
+    purcahse = async () => {
+        const { email, currencyCode, brandsSelected } = this.state
+        const purchaseResponse = await api.purchase(email, currencyCode, brandsSelected);
+
+        if (purchaseResponse.error) {
+            notification['error']({
+                message: 'Order Failure!',
+                description: purchaseResponse.error,
+            });
+        } else {
+            notification['success']({
+                message: 'Order Success!',
+                description: JSON.stringify(purchaseResponse, null, 2)
+            });
+
+            const userBalance = await api.getUserBalance(email, currencyCode)
+
+            this.setState({
+                brandsSelected: [],
+                balance_in_cents: userBalance.balance_in_cents
+            })
+
+            notification['success']({
+                message: 'New Balance',
+                description: `${userBalance.currencyCode} ${userBalance.balance_in_cents / 100}.00`
+            });
+        }
     }
 
     getHeaderInfo = () => {
-
-        const { openLogIn, balanceInCents, currencyCode, email, brands, isLoading, brandsSelected } = this.state
-
+        const { balance_in_cents, currencyCode, email, brandsSelected } = this.state
+        const showBuyItNowButton = brandsSelected.length > 0
         const tooltipText = brandsSelected.map(brand => `${brand.name} ${brand.currentValue}`).join(' | ') || "Nothing Selected!"
 
         const tooltipInfo = <Tooltip placement="bottom" title={tooltipText} arrowPointAtCenter>
             <InfoCircleOutlined />
         </Tooltip>
 
-        return (<><b>Email:</b> {email} | <b>Currency:</b> {currencyCode} | <b>Available Balance:</b> ${ balanceInCents / 100} .00 | <b>  Items In Cart {tooltipInfo} : </b> {brandsSelected.length} </>)
+
+        return (<><b>Email:</b> {email} | <b>Currency:</b> {currencyCode} | <b>Available Balance:</b> ${ balance_in_cents / 100}.00 | <b>  Items In Cart {tooltipInfo} : </b> {brandsSelected.length}
+            {showBuyItNowButton && <span>  | <Button type="primary" size="small" shape="round" icon={<ShoppingCartOutlined />} onClick={this.purcahse}>Buy</Button> </span>}  </>)
     }
 
     render() {
 
-        const { openLogIn, balanceInCents, currencyCode, email, brands, isLoading, brandsSelected } = this.state
+        const { openLogIn, balance_in_cents, currencyCode, brands, isLoading, brandsSelected } = this.state
         const hasBrands = brands.length > 0
         const canSelectMore = brandsSelected.length === 5
 
@@ -130,7 +168,6 @@ class Main extends React.Component {
                 </Header>
 
                 <Content style={css.content}>
-
                     {!openLogIn &&
                         <Text type="secondary"> {this.getHeaderInfo()} </Text>}
                     <LogIn visible={openLogIn} onLogIn={this.onLogIn} />
@@ -141,7 +178,7 @@ class Main extends React.Component {
                     }
                     {hasBrands && <BrandGrid
                         brands={brands}
-                        balanceInCents={balanceInCents}
+                        balanceInCents={balance_in_cents}
                         currencyCode={currencyCode}
                         onSelectBrand={this.onSelectBrand}
                         disableAdding={canSelectMore}

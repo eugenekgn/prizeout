@@ -1,16 +1,16 @@
 import '../styles/login.css'
 import React, { useState, useEffect } from 'react';
 import * as api from '../api'
-import { Button, Modal, Form, Input, Select } from 'antd';
+import { Modal, Form, Input, Select } from 'antd';
 const { Option } = Select;
 
 const LogIn = ({ visible, onLogIn, onCancel }) => {
     const [form] = Form.useForm();
-    const [currencyCodes, setCurrencyCodes] = useState([]);
+    const [currencyCode, setCurrencyCodes] = useState([]);
 
     useEffect(async () => {
         const data = await api.getCurrencyCodes()
-        setCurrencyCodes(data.currencyCodes);
+        setCurrencyCodes(data.currencyCode);
     }, []);
 
     return (
@@ -40,7 +40,6 @@ const LogIn = ({ visible, onLogIn, onCancel }) => {
                     currencyCode: 'USD'
                 }}
             >
-
                 <Form.Item name={'email'}
                     label="Email"
                     hasFeedback
@@ -59,7 +58,7 @@ const LogIn = ({ visible, onLogIn, onCancel }) => {
                     rules={[{ required: true, message: 'Please select your country!' }]}
                 >
                     <Select placeholder="Please select a country">
-                        {!!currencyCodes && currencyCodes.map((curr) => <Option key={curr} value={curr}>{curr.toUpperCase()}</Option>)}
+                        {!!currencyCode && currencyCode.map((curr) => <Option key={curr} value={curr}>{curr.toUpperCase()}</Option>)}
                     </Select>
                 </Form.Item>
             </Form>

@@ -27,7 +27,12 @@ const gridOptions = {
 
 const css = {
     card: { paddingTop: 50, maxWidth: 200 },
-    inputNumber: { margin: '0 2px' }
+    inputNumber: { margin: '0 2px' },
+    helperText: {
+        fontSize: 11,
+        fontWeight: 'bold',
+        color: 'gray'
+    }
 }
 
 class BrandsGrid extends React.PureComponent {
@@ -55,7 +60,7 @@ class BrandsGrid extends React.PureComponent {
                 grid={gridOptions}
                 pagination={{
                     onChange: page => {
-                        console.log(page);
+                        // console.log(page);
                     },
                     pageSize: 50,
                 }}
@@ -75,10 +80,11 @@ class BrandsGrid extends React.PureComponent {
                             {brand.max_price_in_cents &&
                                 <Row>
                                     <Col>
+                                        <span style={css.helperText}>{brand.currency_code} min {brand.min_price_in_cents / 100}.00 - max {brand.max_price_in_cents / 100}</span>
                                         <InputNumber
                                             size="small"
-                                            min={brand.min_price_in_cents}
-                                            max={brand.max_price_in_cents}
+                                            min={brand.min_price_in_cents / 100} //hack
+                                            max={brand.max_price_in_cents / 100} //hack
                                             style={css.inputNumber}
                                             value={brand.currentValue}
                                             precision={2}
@@ -93,9 +99,10 @@ class BrandsGrid extends React.PureComponent {
                             {brand.allowed_prices_in_cents &&
                                 <Row>
                                     <Col>
-                                        <Select defaultValue={brand.currentValue} size={'small'}>
+                                        <br />
+                                        <Select defaultValue={brand.currentValue} size={'small'} onChange={(value) => this.onChange(index, value)} >
                                             {brand.allowed_prices_in_cents &&
-                                                brand.allowed_prices_in_cents.map(m => <Option value={m}>{currencyCode} {m}</Option>)
+                                                brand.allowed_prices_in_cents.map(m => <Option key={`brand-${m}`} value={m}>{currencyCode} {m}</Option>)
                                             }
                                         </Select>
                                         <Button size="small" disabled={disableAdding} onClick={() => onSelectBrand(brand)} >Add</Button>

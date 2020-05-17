@@ -37,17 +37,23 @@ handler.on('/available_currency_codes', function (params, callback, req, res, co
 	CORS: true
 });
 
-handler.on('/purchase', function (params, callback, req, res, core) {
-	core.giftcards.purchase(core, callback, req);
-}, {
-	CORS: true
-});
 
 /*
 	Users
 */
 handler.on('/user/available_balance', function (params, callback, req, res, core) {
 	core.users.available_balance(callback);
+}, {
+	CORS: true
+});
+
+
+/*
+	Inventory
+*/
+
+handler.on('/inventory/purchase', function (params, callback, req, res, core) {
+	core.inventory.purchase(core, callback, req);
 }, {
 	CORS: true
 });

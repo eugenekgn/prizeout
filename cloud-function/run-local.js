@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 8850;
+const PORT = 8850;
 
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -12,6 +12,6 @@ app.all(/(.)?/, function (req, res) {
 	require('./index').main(req, res)
 });
 
-app.listen(port, function () {
-	console.log("Started (" + port + ")")
+app.listen(PORT, function () {
+	console.log("Started (" + PORT + ")")
 })
