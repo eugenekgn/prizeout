@@ -18,6 +18,10 @@
         "underscore": "latest",
         "validator": "^13.0.0"
     },
-    "devDependencies": {},
-    "scripts": {}
+    "devDependencies": {
+        "nodemon": "^2.0.4"
+    },
+    "scripts": {
+        "start": "nodemon ./index"
+    }
 }

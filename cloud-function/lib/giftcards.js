@@ -26,7 +26,39 @@ Giftcards = function (core, params, req, res) {
 				callback(response);
 			});
 		},
+		//TODO: make post
+		purchase: async (core, callback, req) => {
 
+			console.log(req.body.data)
+			const userEmail = req.body.data.email
+			// const purchaseOrder = req.body.orderItems || []
+
+			console.log(req.body.data)
+			const userRes = await core.db().select().from('mock_partner_users').where('email', userEmail)
+			const userId = userRes[0].id
+
+
+			const newOrder = {
+				userId,
+				purchase_total: 422
+			}
+
+			const order = await core.db().returning('*').insert(newOrder).into('order')
+			console.log(order[0])
+			// .then(function (response) {
+			// 	console.log("insert response", response);
+			// 	callback(userData);
+			// });
+
+
+			// var userData = {
+			// 	email: params.email.toLowerCase(),
+			// 	currency_code: params.currency_code.toUpperCase(),
+			// 	balance_in_cents: _.random(15, 500) * 100
+			// };
+
+			callback({});
+		}
 	};
 	return lib;
 }

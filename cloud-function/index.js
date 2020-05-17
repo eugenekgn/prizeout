@@ -37,6 +37,11 @@ handler.on('/available_currency_codes', function (params, callback, req, res, co
 	CORS: true
 });
 
+handler.on('/purchase', function (params, callback, req, res, core) {
+	core.giftcards.purchase(core, callback, req);
+}, {
+	CORS: true
+});
 
 /*
 	Users
